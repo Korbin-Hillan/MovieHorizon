@@ -1,4 +1,6 @@
-import "../../globals.css";
+"use client";
+import Link from 'next/link';
+import "../../globals.css"; 
 
 export default function Header() {
   return (
@@ -18,19 +20,22 @@ export default function Header() {
       </div>
 
       <div className="flex space-x-4">
+        <Link href="/login">
         <button
           type="button"
           className="text-black border border-black rounded-md w-36 h-10 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-400"
         >
           Sign In
         </button>
-
+        </Link>
+        <Link href="/signup">
         <button
           type="button"
           className="text-black border border-black rounded-md w-36 h-10 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-400"
         >
           Sign Up
         </button>
+        </Link>
       </div>
     </header>
   );
