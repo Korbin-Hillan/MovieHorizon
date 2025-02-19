@@ -2,15 +2,12 @@
 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import Image from 'next/image';
 
 interface Movie {
     MovieID: number;
     Title: string;
-    Cost: number;
-    Year: number;
-    Budget: number;
-    Revenue: number;
-    Genre: string;
+    Image: string;
 }
 
 const Movies = () => {
@@ -23,17 +20,22 @@ const Movies = () => {
     }, []);
 
     return (
-        <div>
-            <h1>Movie Database</h1>
-            <ul>
+        <div className="">
+            <h1 className="text-white text-xl">Now in Theaters</h1>
+            <div className="flex flex-wrap gap-4">
                 {movies.map((movie) => (
-                    <li key={movie.MovieID}>
-                        <strong>{movie.Title}</strong> ({movie.Year}) - {movie.Genre}
-                        <br />
-                        Cost: ${movie.Cost} | Budget: ${movie.Budget} | Revenue: ${movie.Revenue}
-                    </li>
+                    <div key={movie.MovieID} className="flex flex-col items-center">
+                    <Image 
+                    src={movie.Image} 
+                    alt={movie.Title} 
+                    width={200} 
+                    height={300} 
+                    className="w-44 h-64 object-cover rounded-lg"
+                    />
+                        <h6 className="text-center text-sm mt-2">{movie.Title}</h6>
+                    </div>
                 ))}
-            </ul>
+            </div>
         </div>
     );
 };

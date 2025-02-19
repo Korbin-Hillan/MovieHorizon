@@ -27,7 +27,11 @@ const pool = mysql.createPool({
 app.get('/movie', async (req, res) => {
     console.log("✅ Received GET request to /movie"); // Log request
     try {
-        const [rows] = await pool.query('SELECT * FROM movie'); // Ensure correct table name
+        const [rows] = await pool.query(`
+            SELECT movies.id AS MovieID, movies.title AS Title, images.image_url AS Image
+            FROM movies
+            LEFT JOIN images ON movies.id = images.movie_id
+        `);
         console.log("🎬 Movies fetched from database:", rows); // Log fetched data
         res.json(rows);
     } catch (err) {
