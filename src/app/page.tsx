@@ -1,7 +1,11 @@
+import Header from "./components/Header/header";
+import Movies from "./components/Header/Movies"
+
 export default function Home() {
   return (
-    <h1 className="text-3xl font-bold underline">
-      Hello world!
-    </h1>
-  )
+    <div className="bg-custom-bg min-h-screen">
+      <Header />
+      <Movies />
+    </div>
+  );
 }
