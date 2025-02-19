@@ -6,7 +6,7 @@ import Sidebar from "./components/NavBar/nav-bar1";
 import { useState } from "react";
 
 export default function Home() {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false); // NavBar is Expanded by default -> useState(true) if collapse by default
 
   return (
     <div className="flex min-h-screen bg-custom-bg transition-all">
