@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { BiCameraMovie } from "react-icons/bi";
+import { ImTv } from "react-icons/im";
 
 const Sidebar = ({
   isCollapsed,
@@ -20,19 +22,27 @@ const Sidebar = ({
         onClick={() => setIsCollapsed(!isCollapsed)}
       >
         {isCollapsed ? (
-          <FiChevronRight size={20} />
+          <FiChevronRight size={30} />
         ) : (
-          <FiChevronLeft size={20} />
+          <FiChevronLeft size={30} />
         )}
       </button>
 
-      {/* Sidebar Content (hidden when collapsed)*/}
+      {/* Sidebar Content (hidden when collapsed) */}
       {!isCollapsed && (
         <div className="p-4">
           <h2 className="text-lg font-bold">Navigation</h2>
-          <div className="mt-4">
-            <p className="cursor-pointer rounded-md bg-gray-800 px-2 py-2 hover:bg-gray-700">
+          <div className="mt-4 space-y-2">
+            {/* Movies Recently Released */}
+            <p className="flex cursor-pointer items-center rounded-md bg-gray-800 px-2 py-2 hover:bg-gray-700">
+              <BiCameraMovie size={25} className="ml-2 mr-3" />
               Movies Recently Released
+            </p>
+
+            {/* Series Recently Released */}
+            <p className="flex cursor-pointer items-center rounded-md bg-gray-800 px-2 py-2 hover:bg-gray-700">
+              <ImTv size={22} className="ml-2 mr-3" />
+              Series Recently Released
             </p>
           </div>
         </div>
