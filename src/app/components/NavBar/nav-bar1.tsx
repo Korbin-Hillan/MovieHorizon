@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { FiChevronLeft } from "react-icons/fi";
 import { BiCameraMovie } from "react-icons/bi";
 import { ImTv } from "react-icons/im";
 
@@ -13,16 +13,18 @@ const Sidebar = ({
 }) => {
   const [textVisible, setTextVisible] = useState(!isCollapsed);
 
-  // Handles Navigation Menu visibility with a delay
+  // Handle text visibility with a delay
   useEffect(() => {
     let timer: NodeJS.Timeout;
 
     if (isCollapsed) {
+      // Hide text immediately when collapsing
       setTextVisible(false);
     } else {
+      // Show text after a delay when expanding
       timer = setTimeout(() => {
         setTextVisible(true);
-      }, 150);
+      }, 150); // Half of the transition duration
     }
 
     return () => {
@@ -39,17 +41,18 @@ const Sidebar = ({
         className="absolute right-[-15px] top-5 rounded-full bg-gray-700 p-1"
         onClick={() => setIsCollapsed(!isCollapsed)}
       >
-        {isCollapsed ? (
-          <FiChevronRight size={30} />
-        ) : (
-          <FiChevronLeft size={30} />
-        )}
+        <FiChevronLeft
+          size={30}
+          className={`transition-transform duration-1000 ${
+            isCollapsed ? "-rotate-180" : "rotate-0"
+          }`}
+        />
       </button>
       {/* Sidebar Content */}
       <div className="mt-16 flex flex-col items-center space-y-1">
         {/* Movies Recently Released */}
         <div
-          className={`group relative flex w-full cursor-pointer items-center rounded-md bg-gray-800 px-2 py-2 hover:bg-gray-700`}
+          className={`group relative flex w-full cursor-pointer items-center rounded-md bg-gray-800 px-4 py-2 hover:bg-gray-700`}
         >
           <div
             className={`${isCollapsed ? "flex w-full justify-center" : "w-auto"}`}
@@ -58,7 +61,7 @@ const Sidebar = ({
           </div>
           {!isCollapsed && (
             <p
-              className={`ml-3 whitespace-nowrap transition-opacity duration-300 ${textVisible ? "opacity-100" : "opacity-0"}`}
+              className={`duration- ml-3 whitespace-nowrap transition-opacity ${textVisible ? "opacity-100" : "opacity-0"}`}
             >
               Movies Recently Released
             </p>
@@ -71,7 +74,7 @@ const Sidebar = ({
         </div>
         {/* Series Recently Released */}
         <div
-          className={`group relative flex w-full cursor-pointer items-center rounded-md bg-gray-800 px-2 py-2 hover:bg-gray-700`}
+          className={`group relative flex w-full cursor-pointer items-center rounded-md bg-gray-800 px-4 py-2 hover:bg-gray-700`}
         >
           <div
             className={`${isCollapsed ? "flex w-full justify-center" : "w-auto"}`}
