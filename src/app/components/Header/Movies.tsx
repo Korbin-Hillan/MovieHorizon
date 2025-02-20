@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Image from 'next/image';
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface Movie {
     MovieID: number;
@@ -12,30 +13,44 @@ interface Movie {
 
 const Movies = () => {
     const [movies, setMovies] = useState<Movie[]>([]);
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
 
     useEffect(() => {
-        axios.get<Movie[]>("http://localhost:5001/movie")
+        axios.get<Movie[]>(`${API_URL}/movie`)
             .then(response => setMovies(response.data))
             .catch(error => console.error("Error fetching movies:", error));
     }, []);
 
     return (
-        <div className="">
-            <h1 className="text-white text-xl">Now in Theaters</h1>
-            <div className="flex flex-wrap gap-4">
+        <div className="relative  p-4">
+            <h1 className="text-white text-xl whitespace-nowrap text-center">Now in Theaters</h1>
+
+            {/* Left Scroll Button */}
+            <button className="absolute bg-black left-0 top-1/2 bg-opacity-70 -translate-y-1/2 rounded-full p-2">
+                <ChevronLeft className="text-white w-6 h-6" />
+            </button>
+
+            {/* Movie List */}
+            <div className="flex gap-4 overflow-x-auto scrollbar-hide">
                 {movies.map((movie) => (
-                    <div key={movie.MovieID} className="flex flex-col items-center">
-                    <Image 
-                    src={movie.Image} 
-                    alt={movie.Title} 
-                    width={200} 
-                    height={300} 
-                    className="w-44 h-64 object-cover rounded-lg"
-                    />
+                    <div key={movie.MovieID} className="flex flex-col items-center flex-shrink-0">
+                        <Image
+                            src={movie.Image}
+                            alt={movie.Title}
+                            width={200}
+                            height={300}
+                            className="w-44 h-64 object-cover rounded-lg"
+                        />
                         <h6 className="text-center text-sm mt-2">{movie.Title}</h6>
                     </div>
                 ))}
             </div>
+
+            {/* Right Scroll Button */}
+            <button className="absolute bg-black right-0 top-1/2 bg-opacity-70 -translate-y-1/2 rounded-full p-2">
+                <ChevronRight className="text-white w-6 h-6" />
+            </button>
+
         </div>
     );
 };

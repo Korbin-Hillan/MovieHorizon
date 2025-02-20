@@ -55,7 +55,7 @@ const Sidebar = ({
           className={`group relative flex w-full cursor-pointer items-center rounded-md bg-gray-800 px-4 py-2 hover:bg-gray-700`}
         >
           <div
-            className={`${isCollapsed ? "flex w-full justify-center" : "w-auto"}`}
+              className="flex-none w-9 justify-center"
           >
             <BiCameraMovie size={29} className="flex-shrink-0" />
           </div>
@@ -77,7 +77,7 @@ const Sidebar = ({
           className={`group relative flex w-full cursor-pointer items-center rounded-md bg-gray-800 px-4 py-2 hover:bg-gray-700`}
         >
           <div
-            className={`${isCollapsed ? "flex w-full justify-center" : "w-auto"}`}
+              className="flex-none w-9 justify-center"
           >
             <ImTv size={25} className="flex-shrink-0" />
           </div>
