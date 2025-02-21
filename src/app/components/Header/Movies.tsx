@@ -30,14 +30,14 @@ const Movies = () => {
     const scrollLeft = () => {
         //Use an if to ensure the property is not null and fully rendered
         if (scrollContainerRef.current) {
-            scrollContainerRef.current.scrollBy({left: -1300, behavior: "smooth"})
+            scrollContainerRef.current.scrollBy({left: -1340, behavior: "smooth"})
         }
     }
 
     const scrollRight = () => {
         //Use an if to ensure the property is not null and fully rendered
         if (scrollContainerRef.current) {
-            scrollContainerRef.current.scrollBy({left: 1300, behavior: "smooth"})
+            scrollContainerRef.current.scrollBy({left: 1340, behavior: "smooth"})
         }
     }
 
