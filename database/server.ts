@@ -32,6 +32,7 @@ app.get('/movie', async (req, res) => {
             FROM movies
             LEFT JOIN images ON movies.id = images.movie_id
         `);
+        
         console.log("🎬 Movies fetched from database:", rows); // Log fetched data
         res.json(rows);
     } catch (err) {
@@ -42,7 +43,7 @@ app.get('/movie', async (req, res) => {
 
 
 // Define server port
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 5002;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
