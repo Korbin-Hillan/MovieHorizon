@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -19,23 +19,42 @@ const Movies = () => {
     const [movies, setMovies] = useState<Movie[]>([]);
     const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
 
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+
     useEffect(() => {
         axios.get<Movie[]>(`${API_URL}/movie`) // ✅ Fixed Syntax Error
             .then(response => setMovies(response.data))
             .catch(error => console.error("Error fetching movies:", error));
     }, []);
 
+    const scrollLeft = () => {
+        //Use an if to ensure the property is not null and fully rendered
+        if (scrollContainerRef.current) {
+            scrollContainerRef.current.scrollBy({left: -1300, behavior: "smooth"})
+        }
+    }
+
+    const scrollRight = () => {
+        //Use an if to ensure the property is not null and fully rendered
+        if (scrollContainerRef.current) {
+            scrollContainerRef.current.scrollBy({left: 1300, behavior: "smooth"})
+        }
+    }
+
     return (
         <div className="relative p-4">
             <h1 className="text-white text-xl whitespace-nowrap text-center">Now in Theaters</h1>
 
             {/* Left Scroll Button */}
-            <button className="absolute bg-black left-0 top-1/2 bg-opacity-70 -translate-y-1/2 rounded-full p-2">
+            <button className="absolute bg-black left-0 top-1/2 bg-opacity-70 -translate-y-1/2 rounded-full p-2 hover:bg-sky-700 active:bg-blue-500"
+            onClick={scrollLeft}>
                 <ChevronLeft className="text-white w-6 h-6" />
             </button>
 
             {/* Movie List */}
-            <div className="flex gap-4 overflow-x-auto scrollbar-hide">
+            <div 
+            ref={scrollContainerRef}
+            className="flex gap-4 overflow-x-auto scrollbar-hide">
                 {movies.map((movie) => {
                     console.log(movie.Title + " " + isLongWord(movie.Title));
 
@@ -60,7 +79,8 @@ const Movies = () => {
             </div>
 
             {/* Right Scroll Button */}
-            <button className="absolute bg-black right-0 top-1/2 bg-opacity-70 -translate-y-1/2 rounded-full p-2">
+            <button className="absolute bg-black right-0 top-1/2 bg-opacity-70 -translate-y-1/2 rounded-full p-2 hover:bg-sky-700 active:bg-blue-500"
+            onClick={scrollRight}>
                 <ChevronRight className="text-white w-6 h-6" />
             </button>
 
