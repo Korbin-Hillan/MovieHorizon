@@ -44,7 +44,7 @@ const Movies = () => {
   return (
     <div className="relative p-4">
       <h1 className="text-white text-xl whitespace-nowrap text-center">
-      Top Rated Movies
+      Movies in Theaters
       </h1>
 
       {/* Left Scroll Button */}
