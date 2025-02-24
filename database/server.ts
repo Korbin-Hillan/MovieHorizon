@@ -1,7 +1,7 @@
 import express from 'express';
-import mysql from 'mysql2/promise';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import axios from 'axios';
 
 // Load .env.local if it exists
 dotenv.config({ path: '.env.local' });
@@ -14,38 +14,48 @@ app.use(cors());
 // Middleware to parse JSON request bodies
 app.use(express.json());
 
-// Create a MySQL connection pool
-const pool = mysql.createPool({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    port: Number(process.env.DB_PORT) || 3306
-});
-
-// GET route to fetch movies
-app.get('/movie', async (req, res) => {
-    console.log("✅ Received GET request to /movie"); // Log request
+app.get("/auth", async (req, res) => {
     try {
-        const [rows] = await pool.query(`
-            SELECT movies.id AS MovieID, movies.title AS Title, images.image_url AS Image
-            FROM movies
-            LEFT JOIN images ON movies.id = images.movie_id
-        `);
-        
-        console.log("🎬 Movies fetched from database:", rows); // Log fetched data
-        res.json(rows);
+      const url = 'https://api.themoviedb.org/3/authentication';
+      console.log("TMDB API Key:", process.env.TMDB_API_KEY);
+      const options = {
+        method: 'GET',
+        headers: {
+          accept: 'application/json',
+          Authorization: `Bearer ${process.env.TMDB_API_KEY}`
+        }
+      };
+  
+      const response = await fetch(url, options);
+      const data = await response.json();
+      res.json(data);
     } catch (err) {
-        console.error("❌ Database Error:", err);
-        res.status(500).json({ message: "Database error" });
+      console.error("Error fetching authentication data:", err);
+      res.status(500).json({ message: "Failed to fetch authentication data" });
     }
-});
+  });
 
-
-// Define server port
-const PORT = process.env.PORT || 5002;
+  app.get("/movie", async (req, res) => {
+    try {
+      const url = 'https://api.themoviedb.org/3/movie/now_playing';
+      const options = {
+        headers: {
+          accept: 'application/json',
+          Authorization: `Bearer ${process.env.TMDB_API_KEY}`
+        }
+      };
+  
+      const response = await axios.get(url, options);
+      // Send only the results array
+      res.json(response.data.results);
+    } catch (err) {
+      console.error("Error fetching top rated movies:", err);
+      res.status(500).json({ message: "Failed to fetch top rated movies" });
+    }
+  });
+  
+  
+const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
-
-
