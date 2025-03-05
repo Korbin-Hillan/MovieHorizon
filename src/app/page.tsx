@@ -3,7 +3,6 @@
 import Header from "./components/Header/header";
 import Movies from "./components/Header/Movies";
 import Sidebar from "./components/NavBar/nav-bar1";
-import MoviesButton from "./components/movies/page"
 import { useState } from "react";
 
 export default function Home() {
