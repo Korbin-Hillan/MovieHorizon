@@ -6,13 +6,20 @@ export default function Header() {
   return (
     <header className="bg-white h-14 flex items-center justify-between px-5">
       <h1 className="text-3xl font-bold text-black">MovieDB</h1>
+      <Link href="/movies">
       <button
-      className="text-black font-semibold">
+      type="button"
+      className="text-black font-semibold"
+      >
         Movies</button>
+      </Link>
+      <Link href="/TVShows">
       <button
+      type="button"
       className="text-black font-semibold">
       TV Shows
       </button>
+      </Link>
       <div className="w-full sm:w-1/3">
         <label htmlFor="movie-search" className="sr-only">
           Search movies
