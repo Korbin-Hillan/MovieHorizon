@@ -7,12 +7,9 @@ const Header = () => {
     <header className="bg-white h-14 flex items-center justify-between px-40">
       <h1 className="text-3xl font-bold text-black">MovieDB</h1>
 
-      <button>Movies</button>
-
 
 
       <div className="flex space-x-4">
-        dsadsa
         <Link href="/login">
         <button
           type="button"
