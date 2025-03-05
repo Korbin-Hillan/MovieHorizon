@@ -1,12 +1,13 @@
 "use client";
 
-import Header from "./components/Header/header";
-import Movies from "./components/Header/Movies";
-import Sidebar from "./components/NavBar/nav-bar1";
-import MoviesButton from "./components/movies/page"
+import Header from "../components/Header/header";
+import Movies from "../components/Header/Movies";
+import Sidebar from "../components/NavBar/nav-bar1";
+import MoviesButton from "./movies/page"
+
 import { useState } from "react";
 
-export default function Home() {
+export default function MoviesPage() {
   const [isCollapsed, setIsCollapsed] = useState(false); // NavBar is Expanded by default -> useState(true) if collapse by default
 
   return (
@@ -19,7 +20,6 @@ export default function Home() {
         className={`transition-all duration-300 ${isCollapsed ? "ml-16 w-[calc(100%-4rem)]" : "ml-64 w-[calc(100%-16rem)]"}`}
       >
         <Header />
-        <Movies />
       </div>
     </div>
   );
