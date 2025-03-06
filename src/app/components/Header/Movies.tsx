@@ -48,6 +48,54 @@ const Movies = () => {
       ref.current.scrollBy({ left: 1340, behavior: "smooth" });
     }
   };
+
+  const scrollContinuously = (
+    ref: React.RefObject<HTMLDivElement | null>,
+    direction: "left" | "right"
+  ) => {
+    if (!ref.current) return;
+  
+    let scrollAmount = direction === "right" ? 5 : -5;
+    let intervalId: NodeJS.Timeout | null = null;
+    let delayTimeout: NodeJS.Timeout | null = null;
+    let isHeld = false;
+  
+    // Start delay timer (500ms before continuous scrolling)
+    delayTimeout = setTimeout(() => {
+      isHeld = true;
+      intervalId = setInterval(() => {
+        if (ref.current) {
+          ref.current.scrollLeft += scrollAmount;
+        }
+      }, 10);
+    }, 100); // 500ms delay before continuous scroll starts
+  
+    const stopScrolling = () => {
+      if (delayTimeout) {
+        clearTimeout(delayTimeout);
+        delayTimeout = null;
+      }
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+  
+      // Only trigger small scroll if the button was *not* held
+      if (!isHeld && ref.current) {
+        ref.current.scrollBy({ left: scrollAmount * 267, behavior: "smooth" });
+      }
+  
+      isHeld = false; // Reset hold state
+  
+      document.removeEventListener("mouseup", stopScrolling);
+      document.removeEventListener("mouseleave", stopScrolling);
+    };
+  
+    document.addEventListener("mouseup", stopScrolling);
+    document.addEventListener("mouseleave", stopScrolling);
+  };
+  
+  
   
 
   return (
@@ -57,8 +105,8 @@ const Movies = () => {
         <h1 className="text-white text-xl text-center">Movies in Theaters</h1>
         <button
           className="absolute bg-black left-0 top-1/2 bg-opacity-70 -translate-y-1/2 rounded-full p-2 hover:bg-sky-700 active:bg-blue-500"
-          onClick={() => scrollLeft(moviesInTheatersRef)}
-        >
+          onMouseDown={() => scrollContinuously(moviesInTheatersRef, "left")}
+          >
           <ChevronLeft className="text-white w-6 h-6" />
         </button>
 
@@ -87,7 +135,8 @@ const Movies = () => {
 
         <button
           className="absolute bg-black right-0 top-1/2 bg-opacity-70 -translate-y-1/2 rounded-full p-2 hover:bg-sky-700 active:bg-blue-500"
-          onClick={() => scrollRight(moviesInTheatersRef)}
+          onMouseDown={() => scrollContinuously(moviesInTheatersRef, "right")}
+
         >
           <ChevronRight className="text-white w-6 h-6" />
         </button>
@@ -98,7 +147,7 @@ const Movies = () => {
         <h1 className="text-white text-xl text-center">Popular Movies</h1>
         <button
           className="absolute bg-black left-0 top-1/2 bg-opacity-70 -translate-y-1/2 rounded-full p-2 hover:bg-sky-700 active:bg-blue-500"
-          onClick={() => scrollLeft(popularMoviesRef)}
+          onMouseDown={() => scrollContinuously(popularMoviesRef, "left")}
         >
           <ChevronLeft className="text-white w-6 h-6" />
         </button>
@@ -128,7 +177,7 @@ const Movies = () => {
 
         <button
           className="absolute bg-black right-0 top-1/2 bg-opacity-70 -translate-y-1/2 rounded-full p-2 hover:bg-sky-700 active:bg-blue-500"
-          onClick={() => scrollRight(popularMoviesRef)}
+          onMouseDown={() => scrollContinuously(popularMoviesRef, "right")}
         >
           <ChevronRight className="text-white w-6 h-6" />
         </button>
@@ -139,7 +188,7 @@ const Movies = () => {
         <h1 className="text-white text-xl text-center">Popular TV Shows</h1>
         <button
           className="absolute bg-black left-0 top-1/2 bg-opacity-70 -translate-y-1/2 rounded-full p-2 hover:bg-sky-700 active:bg-blue-500"
-          onClick={() => scrollLeft(popularTVShowsRef)}
+          onMouseDown={() => scrollContinuously(popularTVShowsRef, "left")}
         >
           <ChevronLeft className="text-white w-6 h-6" />
         </button>
@@ -169,7 +218,7 @@ const Movies = () => {
 
         <button
           className="absolute bg-black right-0 top-1/2 bg-opacity-70 -translate-y-1/2 rounded-full p-2 hover:bg-sky-700 active:bg-blue-500"
-          onClick={() => scrollRight(popularTVShowsRef)}
+          onMouseDown={() => scrollContinuously(popularTVShowsRef, "right")}
         >
           <ChevronRight className="text-white w-6 h-6" />
         </button>
