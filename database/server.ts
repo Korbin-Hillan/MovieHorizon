@@ -162,7 +162,42 @@ const app: express.Application = express();
       res.status(500).json({ message: "Failed to fetch movies" });
     }
   });
+
+  app.get("/Popular_Movies", async (req: Request, res: Response) => {
+    try {
+      const url = `https://api.themoviedb.org/3/movie/popular?language=en-US&page=1`;
+      const options = {
+        headers: {
+          accept: "application/json",
+          Authorization: `Bearer ${process.env.TMDB_API_KEY}`,
+        },
+      };
   
+      const response = await axios.get(url, options);
+      res.json(response.data.results);
+    } catch (err) {
+      console.error("Error fetching movies:", err);
+      res.status(500).json({ message: "Failed to fetch movies" });
+    }
+  });
+  
+  app.get("/Popular_TVShows", async (req: Request, res: Response) => {
+    try {
+      const url = `https://api.themoviedb.org/3/tv/popular?language=en-US&page=1`;
+      const options = {
+        headers: {
+          accept: "application/json",
+          Authorization: `Bearer ${process.env.TMDB_API_KEY}`,
+        },
+      };
+  
+      const response = await axios.get(url, options);
+      res.json(response.data.results);
+    } catch (err) {
+      console.error("Error fetching movies:", err);
+      res.status(500).json({ message: "Failed to fetch movies" });
+    }
+  });
     
     
   const PORT = process.env.PORT || 5001;
