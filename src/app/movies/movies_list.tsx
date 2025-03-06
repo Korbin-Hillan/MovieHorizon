@@ -14,6 +14,8 @@ interface Movie {
 const MoviesList = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [page, setPage] = useState<number>(1); // Current page state
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [inputValue, setInputValue] = useState<string>(page.toString());
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
 
   useEffect(() => {
@@ -29,6 +31,25 @@ const MoviesList = () => {
   const nextPage = () => setPage((prev) => prev + 1);
 
   const prevPage = () => setPage((prev) => (prev > 1 ? prev - 1 : 1));
+  
+  const handleDoubleClick = () => {
+    setIsEditing(true);
+    setInputValue(page.toString()); // Set input value to current page
+  };
+
+  const handleBlur = () => {
+    setIsEditing(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      const newPage = parseInt(inputValue, 10);
+      if (!isNaN(newPage) && newPage > 0) {
+        setPage(newPage);
+      }
+      setIsEditing(false);
+    }
+  };
 
   return (
     <div className="p-4">
@@ -57,7 +78,7 @@ const MoviesList = () => {
         })}
       </div>
 
-      {}
+      {/* Pagination Controls */}
       <div className="flex justify-center gap-4 mt-6">
         <button
           onClick={prevPage}
@@ -66,7 +87,28 @@ const MoviesList = () => {
         >
           Previous
         </button>
-        <span className="text-white text-lg">Page {page}</span>
+
+        {/* Editable Page Number */}
+        {isEditing ? (
+          <input 
+            type="text"
+            className="text-black text-lg text-center w-12"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onBlur={handleBlur}
+            onKeyDown={handleKeyDown}
+            autoFocus
+          />
+        ) : (
+          <span 
+          className="text-white text-lg cursor-pointer"
+          onDoubleClick={handleDoubleClick}
+          >
+            Page {page}
+          </span>
+
+        )}
+
         <button
           onClick={nextPage}
           className="px-4 py-2 bg-gray-700 text-white rounded-md"
