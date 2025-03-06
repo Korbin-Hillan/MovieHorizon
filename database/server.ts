@@ -140,6 +140,28 @@ const app: express.Application = express();
     }
   });
   
+  app.get("/tv_list", async (req: Request, res: Response) => {
+    try {
+      // Get page number from query params (default to 1)
+      const page = req.query.page ? Number(req.query.page) : 1;
+  
+      // Construct URL with dynamic page parameter
+      const url = `https://api.themoviedb.org/3/discover/tv?include_adult=false&include_null_first_air_dates=false&language=en-US&page=${page}&sort_by=popularity.desc`;
+
+      const options = {
+        headers: {
+          accept: "application/json",
+          Authorization: `Bearer ${process.env.TMDB_API_KEY}`,
+        },
+      };
+  
+      const response = await axios.get(url, options);
+      res.json(response.data.results);
+    } catch (err) {
+      console.error("Error fetching movies:", err);
+      res.status(500).json({ message: "Failed to fetch movies" });
+    }
+  });
   
     
     
