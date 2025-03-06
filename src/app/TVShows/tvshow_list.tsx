@@ -53,7 +53,7 @@ const TVList = () => {
 
   return (
     <div className="p-4">
-      <h1 className="text-white text-xl text-center mb-6">Movies</h1>
+      <h1 className="text-white text-xl text-center mb-6">TV Shows</h1>
 
       {/* Movie Grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-6">
