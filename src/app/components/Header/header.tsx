@@ -5,7 +5,9 @@ import "../../globals.css";
 export default function Header() {
   return (
     <header className="bg-white h-14 flex items-center justify-between px-5">
-      <h1 className="text-3xl font-bold text-black">MovieDB</h1>
+      <Link href=".">
+        <h1 className="text-3xl font-bold text-black">MovieDB</h1>
+      </Link>
       <Link href="/movies">
   <button type="button" className="text-black font-semibold">
     Movies
