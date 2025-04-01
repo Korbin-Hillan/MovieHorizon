@@ -11,30 +11,43 @@ interface Movie {
   poster_path: string;
 }
 
-const MoviesList = () => {
-  const [movies, setMovies] = useState<Movie[]>([]);
-  const [page, setPage] = useState<number>(1); // Current page state
+// Add props interface to accept the movies prop
+interface Movies_listProps {
+  movies?: Movie[]; // Make it optional with ?
+}
+
+const Movies_list = ({ movies: propMovies }: Movies_listProps = {}) => {
+  const [localMovies, setLocalMovies] = useState<Movie[]>(propMovies || []);
+  const [page, setPage] = useState<number>(1);
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>(page.toString());
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
 
+  // If propMovies changes, update our state
   useEffect(() => {
-    axios
-      .get(`${API_URL}/movies_list?page=${page}`)
-      .then((response) => {
-        console.log("Response data:", response.data);
-        setMovies(response.data);
-      })
-      .catch((error) => console.error("Error fetching movies:", error));
-  }, [page]);
+    if (propMovies && propMovies.length > 0) {
+      setLocalMovies(propMovies);
+    }
+  }, [propMovies]);
+
+  // Only fetch if we don't have movies from props or when page changes
+  useEffect(() => {
+    if (!propMovies || propMovies.length === 0 || page > 1) {
+      axios
+        .get(`${API_URL}/movie?page=${page}`)
+        .then((response) => {
+          setLocalMovies(response.data);
+        })
+        .catch((error) => console.error("Error fetching movies:", error));
+    }
+  }, [API_URL, page, propMovies]);
 
   const nextPage = () => setPage((prev) => prev + 1);
-
   const prevPage = () => setPage((prev) => (prev > 1 ? prev - 1 : 1));
   
   const handleDoubleClick = () => {
     setIsEditing(true);
-    setInputValue(page.toString()); // Set input value to current page
+    setInputValue(page.toString());
   };
 
   const handleBlur = () => {
@@ -57,7 +70,7 @@ const MoviesList = () => {
 
       {/* Movie Grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-6">
-        {movies.map((movie) => {
+        {localMovies.map((movie) => {
           const displayedTitle =
             movie.title.length > 21
               ? movie.title.substring(0, 21) + "..."
@@ -101,12 +114,11 @@ const MoviesList = () => {
           />
         ) : (
           <span 
-          className="text-white text-lg cursor-pointer"
-          onDoubleClick={handleDoubleClick}
+            className="text-white text-lg cursor-pointer"
+            onDoubleClick={handleDoubleClick}
           >
             Page {page}
           </span>
-
         )}
 
         <button
@@ -120,4 +132,4 @@ const MoviesList = () => {
   );
 };
 
-export default MoviesList;
+export default Movies_list;
