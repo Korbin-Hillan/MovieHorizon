@@ -8,10 +8,8 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
     env:
       NEXT_PUBLIC_API_URL: https://moviehorizon.fun
-      TMDB_API_KEY: "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4Yzg1MTJiNzgwMDYxYmQwZDVmZGZkNWU4ODMwMmY4ZiIsIm5iZiI6MTc0MDM1MjAxOC45NTYsInN1YiI6IjY3YmJhYTEyNDEwNjBhOGQ4ZmJlOWM4MSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.lTk5SahOG4XmXWmgXzNCKZUEdClUbnQ1COSmbfupOYM"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -28,10 +26,22 @@ jobs:
       - name: Build Next.js app
         run: npm run build
 
-      - name: Deploy to branch
-        uses: JamesIves/github-pages-deploy-action@v4
+      - name: Deploy to Hostinger
+        uses: appleboy/scp-action@master
         with:
-          folder: out
-          branch: gh-pages
-          clean: true
-          token: ${{ secrets.DEPLOY_TOKEN }} # Use your PAT for authentication
+          host: ${{ secrets.HOSTINGER_HOST }}
+          username: ${{ secrets.HOSTINGER_USERNAME }}
+          password: ${{ secrets.HOSTINGER_PASSWORD }}
+          source: "out/,server/" # Include both frontend and backend
+          target: "/home/yourusername/moviehorizon.fun/"
+
+      - name: Start Express server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOSTINGER_HOST }}
+          username: ${{ secrets.HOSTINGER_USERNAME }}
+          password: ${{ secrets.HOSTINGER_PASSWORD }}
+          script: |
+            cd /home/yourusername/moviehorizon.fun/server
+            npm install
+            pm2 restart server.js || pm2 start server.js --name "movie-api"
