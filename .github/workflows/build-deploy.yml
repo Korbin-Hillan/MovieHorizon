@@ -26,7 +26,34 @@ jobs:
       - name: Build Next.js app
         run: npm run build
 
+      - name: Display build output directory contents
+        run: |
+          echo "Current directory structure:"
+          ls -la
+          echo "Build output directory contents:"
+          if [ -d "out" ]; then
+            ls -la out/
+          else
+            echo "The 'out' directory doesn't exist!"
+            echo "Available directories:"
+            ls -la
+          fi
+
       - name: Deploy frontend to Hostinger
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOSTINGER_HOST }}
+          username: ${{ secrets.HOSTINGER_USERNAME }}
+          password: ${{ secrets.HOSTINGER_PASSWORD }}
+          port: 65002
+          script: |
+            # Clear the public_html directory first
+            echo "Clearing public_html directory..."
+            rm -rf /home/u451682670/public_html/*
+            echo "Public_html directory contents after clearing:"
+            ls -la /home/u451682670/public_html/
+
+      - name: Transfer build files to server
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.HOSTINGER_HOST }}
@@ -34,11 +61,21 @@ jobs:
           password: ${{ secrets.HOSTINGER_PASSWORD }}
           port: 65002
           use_insecure_cipher: true
-          source: "out/*"
+          source: "out/." # Use dot notation to copy contents without the parent directory
           target: "/home/u451682670/public_html/"
           timeout: 60s
-          strip_components: 1
           debug: true
+
+      - name: Verify frontend deployment
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOSTINGER_HOST }}
+          username: ${{ secrets.HOSTINGER_USERNAME }}
+          password: ${{ secrets.HOSTINGER_PASSWORD }}
+          port: 65002
+          script: |
+            echo "Checking public_html directory contents after deployment:"
+            ls -la /home/u451682670/public_html/
 
   deploy-backend:
     runs-on: ubuntu-latest
