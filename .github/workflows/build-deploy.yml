@@ -32,8 +32,12 @@ jobs:
           host: ${{ secrets.HOSTINGER_HOST }}
           username: ${{ secrets.HOSTINGER_USERNAME }}
           password: ${{ secrets.HOSTINGER_PASSWORD }}
+          port: 65002
+          use_insecure_cipher: true
           source: "out/,server/" # Include both frontend and backend
-          target: "/home/yourusername/moviehorizon.fun/"
+          target: "/home/u451682670/moviehorizon.fun/"
+          timeout: 60s
+          debug: true
 
       - name: Start Express server
         uses: appleboy/ssh-action@master
@@ -42,6 +46,6 @@ jobs:
           username: ${{ secrets.HOSTINGER_USERNAME }}
           password: ${{ secrets.HOSTINGER_PASSWORD }}
           script: |
-            cd /home/yourusername/moviehorizon.fun/server
+            cd /home/u451682670/moviehorizon.fun/server
             npm install
             pm2 restart server.js || pm2 start server.js --name "movie-api"
