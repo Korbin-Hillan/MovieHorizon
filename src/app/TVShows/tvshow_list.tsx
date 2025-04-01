@@ -26,7 +26,7 @@ const TVList = () => {
         setMovies(response.data);
       })
       .catch((error) => console.error("Error fetching movies:", error));
-  }, [page]);
+  }, [API_URL, page]); // Added page to dependency array
 
   const nextPage = () => setPage((prev) => prev + 1);
 
@@ -106,7 +106,6 @@ const TVList = () => {
           >
             Page {page}
           </span>
-
         )}
 
         <button

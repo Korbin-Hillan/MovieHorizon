@@ -2,32 +2,11 @@
 
 import Header from "../components/Header/header";
 import Sidebar from "../components/NavBar/nav-bar1";
-import axios from "axios";
 import TV_List from "./tvshow_list"
-import React, { useEffect, useState } from "react";
-
-interface TVShow {
-  id: number;
-  name: string;
-  overview: string;
-  poster_path: string;
-}
+import React, { useState } from "react";
 
 export default function MoviesPage() {
   const [isCollapsed, setIsCollapsed] = useState(false); // NavBar is Expanded by default -> useState(true) if collapse by default
-  const [movies, setMovies] = useState<TVShow[]>([]); // Fixed: Added 'movies' state variable
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
-
-
-  useEffect(() => {
-    axios
-      .get(`${API_URL}/tv_list`)
-      .then((response) => {
-        console.log("Response data:", response.data);
-        setMovies(response.data);
-      })
-      .catch((error) => console.error("Error fetching movies:", error));
-  }, [API_URL]);
   
   return (
     <div className="flex min-h-screen bg-custom-bg transition-all">
