@@ -12,7 +12,6 @@ const nextConfig = {
     ],
   },
   skipTrailingSlashRedirect: true,
-  // Remove the skipApiRoutes and exportPathMap options
 };
 
 export default nextConfig;

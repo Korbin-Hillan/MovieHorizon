@@ -39,17 +39,6 @@ jobs:
               ],
             },
             skipTrailingSlashRedirect: true,
-            skipApiRoutes: true,
-            // Only build specific pages
-            exportPathMap: async function () {
-              return {
-                "/": { page: "/" },
-                "/movies": { page: "/movies" },
-                "/TVShows": { page: "/TVShows" },
-                "/login": { page: "/login" },
-                "/signup": { page: "/signup" },
-              };
-            },
           };
 
           export default nextConfig;
