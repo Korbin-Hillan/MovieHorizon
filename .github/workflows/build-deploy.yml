@@ -34,9 +34,10 @@ jobs:
           password: ${{ secrets.HOSTINGER_PASSWORD }}
           port: 65002
           use_insecure_cipher: true
-          source: "out/,server/" # Include both frontend and backend
-          target: "/home/u451682670/moviehorizon.fun/"
+          source: "out/*"
+          target: "/home/u451682670/public_html/"
           timeout: 60s
+          strip_components: 1
           debug: true
 
       - name: Start Express server
