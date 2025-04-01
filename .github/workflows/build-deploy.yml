@@ -1,45 +1,19 @@
-name: Build and Deploy Next.js App
+name: Direct File Upload Test
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 jobs:
-  deploy-frontend:
+  test-file-upload:
     runs-on: ubuntu-latest
-    env:
-      NEXT_PUBLIC_API_URL: https://moviehorizon.fun
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: "18"
-          cache: "npm"
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build Next.js app
-        run: npm run build
-
-      - name: Display build output directory contents
+      - name: Create test file
         run: |
-          echo "Current directory structure:"
-          ls -la
-          echo "Build output directory contents:"
-          if [ -d "out" ]; then
-            ls -la out/
-          else
-            echo "The 'out' directory doesn't exist!"
-            echo "Available directories:"
-            ls -la
-          fi
+          echo "<html><body><h1>Test File</h1><p>This is a test file uploaded at $(date)</p></body></html>" > test.html
+          echo "Test file created:"
+          cat test.html
 
-      - name: Deploy frontend to Hostinger
+      - name: Check Hostinger directory
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOSTINGER_HOST }}
@@ -47,26 +21,37 @@ jobs:
           password: ${{ secrets.HOSTINGER_PASSWORD }}
           port: 65002
           script: |
-            # Clear the public_html directory first
-            echo "Clearing public_html directory..."
-            rm -rf /home/u451682670/public_html/*
-            echo "Public_html directory contents after clearing:"
+            echo "Checking public_html directory permissions:"
+            ls -la /home/u451682670/
             ls -la /home/u451682670/public_html/
+            echo "Who am I and what are my permissions:"
+            whoami
+            id
 
-      - name: Transfer build files to server
+      - name: Upload directly via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOSTINGER_HOST }}
+          username: ${{ secrets.HOSTINGER_USERNAME }}
+          password: ${{ secrets.HOSTINGER_PASSWORD }}
+          port: 65002
+          script: |
+            echo "<html><body><h1>Test File Created on Server</h1><p>This is a test file created directly on the server at $(date)</p></body></html>" > /home/u451682670/public_html/test-direct.html
+            echo "File created:"
+            ls -la /home/u451682670/public_html/test-direct.html
+
+      - name: Upload test file using SCP
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.HOSTINGER_HOST }}
           username: ${{ secrets.HOSTINGER_USERNAME }}
           password: ${{ secrets.HOSTINGER_PASSWORD }}
           port: 65002
-          use_insecure_cipher: true
-          source: "out/." # Use dot notation to copy contents without the parent directory
+          source: "test.html"
           target: "/home/u451682670/public_html/"
-          timeout: 60s
           debug: true
 
-      - name: Verify frontend deployment
+      - name: Verify file upload
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOSTINGER_HOST }}
@@ -74,103 +59,8 @@ jobs:
           password: ${{ secrets.HOSTINGER_PASSWORD }}
           port: 65002
           script: |
-            echo "Checking public_html directory contents after deployment:"
+            echo "Checking for uploaded test file:"
+            ls -la /home/u451682670/public_html/test.html || echo "test.html not found!"
+            ls -la /home/u451682670/public_html/test-direct.html || echo "test-direct.html not found!"
+            echo "Contents of public_html directory:"
             ls -la /home/u451682670/public_html/
-
-  deploy-backend:
-    runs-on: ubuntu-latest
-    needs: deploy-frontend
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Create server directory and files directly on server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOSTINGER_HOST }}
-          username: ${{ secrets.HOSTINGER_USERNAME }}
-          password: ${{ secrets.HOSTINGER_PASSWORD }}
-          port: 65002
-          script: |
-            # Create server directory
-            mkdir -p /home/u451682670/moviehorizon.fun/server
-
-            # Create package.json
-            cat > /home/u451682670/moviehorizon.fun/server/package.json << 'EOL'
-            {
-              "name": "movie-horizon-api",
-              "version": "1.0.0",
-              "description": "API server for MovieHorizon",
-              "main": "server.js",
-              "scripts": {
-                "start": "node server.js"
-              },
-              "dependencies": {
-                "express": "^4.18.2",
-                "cors": "^2.8.5"
-              }
-            }
-            EOL
-
-            # Create server.js
-            cat > /home/u451682670/moviehorizon.fun/server/server.js << 'EOL'
-            const express = require('express');
-            const cors = require('cors');
-            const app = express();
-            const port = process.env.PORT || 3000;
-
-            app.use(cors());
-            app.use(express.json());
-
-            app.get('/', (req, res) => {
-              res.json({ message: 'MovieHorizon API is running' });
-            });
-
-            app.listen(port, () => {
-              console.log(`Server running on port ${port}`);
-            });
-            EOL
-
-            # Display created files for debugging
-            ls -la /home/u451682670/moviehorizon.fun/server/
-
-      - name: Setup server environment and start
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOSTINGER_HOST }}
-          username: ${{ secrets.HOSTINGER_USERNAME }}
-          password: ${{ secrets.HOSTINGER_PASSWORD }}
-          port: 65002
-          script: |
-            # Navigate to server directory
-            cd /home/u451682670/moviehorizon.fun/server
-
-            # Check if Node.js is installed, if not use NVM to install
-            if ! command -v node &> /dev/null; then
-              echo "Node.js not found, installing via NVM..."
-              # Install NVM
-              curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
-              export NVM_DIR="$HOME/.nvm"
-              [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-              # Install Node.js
-              nvm install 18
-              nvm use 18
-            fi
-
-            # Display files for debugging
-            echo "Current directory contents:"
-            ls -la
-            echo "Current directory path:"
-            pwd
-
-            # Install dependencies
-            npm install
-
-            # Install PM2 globally if not installed
-            if ! command -v pm2 &> /dev/null; then
-              echo "PM2 not found, installing..."
-              npm install -g pm2
-            fi
-
-            # Start or restart the server
-            pm2 restart server.js || pm2 start server.js --name "movie-api"
