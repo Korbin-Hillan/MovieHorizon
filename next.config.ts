@@ -1,16 +1,18 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  output: 'export', // Enable static export
+// next.config.mjs
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  output: "export",
   images: {
-    unoptimized: true, // Required for static export
+    unoptimized: true,
     remotePatterns: [
       {
-        protocol: 'https', // Allows all HTTPS images
-        hostname: '**', // Allows any domain
+        protocol: "https",
+        hostname: "**",
       },
     ],
   },
+  skipTrailingSlashRedirect: true,
+  // Remove the skipApiRoutes and exportPathMap options
 };
 
 export default nextConfig;
