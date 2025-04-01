@@ -26,7 +26,7 @@ jobs:
       - name: Build Next.js app
         run: npm run build
 
-      - name: Deploy to Hostinger
+      - name: Deploy frontend to Hostinger
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.HOSTINGER_HOST }}
@@ -40,6 +40,20 @@ jobs:
           strip_components: 1
           debug: true
 
+      # Add this step to deploy server files
+      - name: Deploy server files to Hostinger
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOSTINGER_HOST }}
+          username: ${{ secrets.HOSTINGER_USERNAME }}
+          password: ${{ secrets.HOSTINGER_PASSWORD }}
+          port: 65002
+          use_insecure_cipher: true
+          source: "server/*" # Adjust this path based on where your server files are located in your repo
+          target: "/home/u451682670/moviehorizon.fun/server/"
+          timeout: 60s
+          debug: true
+
       - name: Setup server environment and start
         uses: appleboy/ssh-action@master
         with:
@@ -48,12 +62,6 @@ jobs:
           password: ${{ secrets.HOSTINGER_PASSWORD }}
           port: 65002
           script: |
-            # Check if directory exists, if not create it
-            mkdir -p /home/u451682670/moviehorizon.fun/server
-
-            # Deploy server files (assuming they're in a 'server' directory in your repo)
-            # If your server files are elsewhere, adjust this part
-
             # Navigate to server directory
             cd /home/u451682670/moviehorizon.fun/server
 
