@@ -8,6 +8,8 @@
     "dev:frontend": "next dev --turbopack",
     "dev:backend": "npx tsx database/server.ts",
     "build": "next build",
+    "build:static": "next build", 
+    "postbuild:static": "cp -r ./public ./out/",
     "start": "next start",
     "lint": "next lint"
   },
