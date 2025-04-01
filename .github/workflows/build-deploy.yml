@@ -9,6 +9,9 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
+    env:
+      NEXT_PUBLIC_API_URL: https://moviehorizon.fun
+      TMDB_API_KEY: "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4Yzg1MTJiNzgwMDYxYmQwZDVmZGZkNWU4ODMwMmY4ZiIsIm5iZiI6MTc0MDM1MjAxOC45NTYsInN1YiI6IjY3YmJhYTEyNDEwNjBhOGQ4ZmJlOWM4MSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.lTk5SahOG4XmXWmgXzNCKZUEdClUbnQ1COSmbfupOYM"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
