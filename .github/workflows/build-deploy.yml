@@ -1,8 +1,8 @@
-name: Build and Deploy Frontend to Hostinger
+name: Build and Deploy Next.js App
 
 on:
   push:
-    branches: [main, master]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -10,55 +10,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Setup Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "20"
+          node-version: "18"
           cache: "npm"
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Create Next.js config file
-        run: |
-          cat > next.config.mjs << 'EOL'
-          // next.config.mjs
-          /** @type {import('next').NextConfig} */
-          const nextConfig = {
-            output: "export",
-            images: {
-              unoptimized: true,
-              remotePatterns: [
-                {
-                  protocol: "https",
-                  hostname: "**",
-                },
-              ],
-            },
-            skipTrailingSlashRedirect: true,
-          };
-
-          export default nextConfig;
-          EOL
-
-      - name: Build Next.js application
+      - name: Build Next.js app
         run: npm run build
-        env:
-          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
 
-      - name: Verify build output
-        run: |
-          echo "Checking for 'out' directory:"
-          ls -la out || echo "Out directory not found"
-
-      - name: Deploy to Hostinger via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      - name: Deploy to branch
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./out/
-          server-dir: ${{ secrets.FTP_SERVER_DIR }}
+          folder: out
+          branch: gh-pages
+          clean: true
+          token: ${{ secrets.DEPLOY_TOKEN }} # Use your PAT for authentication
