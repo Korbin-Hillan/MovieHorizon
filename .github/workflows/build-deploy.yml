@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-deploy:
+  deploy-frontend:
     runs-on: ubuntu-latest
     env:
       NEXT_PUBLIC_API_URL: https://moviehorizon.fun
@@ -40,60 +40,62 @@ jobs:
           strip_components: 1
           debug: true
 
-      # First create a minimal server implementation if it doesn't exist
-      - name: Create server files
-        run: |
-          mkdir -p server-deploy
+  deploy-backend:
+    runs-on: ubuntu-latest
+    needs: deploy-frontend
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-          # Create package.json if it doesn't exist
-          cat > server-deploy/package.json << 'EOL'
-          {
-            "name": "movie-horizon-api",
-            "version": "1.0.0",
-            "description": "API server for MovieHorizon",
-            "main": "server.js",
-            "scripts": {
-              "start": "node server.js"
-            },
-            "dependencies": {
-              "express": "^4.18.2",
-              "cors": "^2.8.5"
-            }
-          }
-          EOL
-
-          # Create a basic server.js if it doesn't exist
-          cat > server-deploy/server.js << 'EOL'
-          const express = require('express');
-          const cors = require('cors');
-          const app = express();
-          const port = process.env.PORT || 3000;
-
-          app.use(cors());
-          app.use(express.json());
-
-          app.get('/', (req, res) => {
-            res.json({ message: 'MovieHorizon API is running' });
-          });
-
-          app.listen(port, () => {
-            console.log(`Server running on port ${port}`);
-          });
-          EOL
-
-      # Deploy the server files we just created
-      - name: Deploy server files to Hostinger
-        uses: appleboy/scp-action@master
+      - name: Create server directory and files directly on server
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOSTINGER_HOST }}
           username: ${{ secrets.HOSTINGER_USERNAME }}
           password: ${{ secrets.HOSTINGER_PASSWORD }}
           port: 65002
-          use_insecure_cipher: true
-          source: "server-deploy/*"
-          target: "/home/u451682670/moviehorizon.fun/server/"
-          timeout: 60s
-          debug: true
+          script: |
+            # Create server directory
+            mkdir -p /home/u451682670/moviehorizon.fun/server
+
+            # Create package.json
+            cat > /home/u451682670/moviehorizon.fun/server/package.json << 'EOL'
+            {
+              "name": "movie-horizon-api",
+              "version": "1.0.0",
+              "description": "API server for MovieHorizon",
+              "main": "server.js",
+              "scripts": {
+                "start": "node server.js"
+              },
+              "dependencies": {
+                "express": "^4.18.2",
+                "cors": "^2.8.5"
+              }
+            }
+            EOL
+
+            # Create server.js
+            cat > /home/u451682670/moviehorizon.fun/server/server.js << 'EOL'
+            const express = require('express');
+            const cors = require('cors');
+            const app = express();
+            const port = process.env.PORT || 3000;
+
+            app.use(cors());
+            app.use(express.json());
+
+            app.get('/', (req, res) => {
+              res.json({ message: 'MovieHorizon API is running' });
+            });
+
+            app.listen(port, () => {
+              console.log(`Server running on port ${port}`);
+            });
+            EOL
+
+            # Display created files for debugging
+            ls -la /home/u451682670/moviehorizon.fun/server/
 
       - name: Setup server environment and start
         uses: appleboy/ssh-action@master
@@ -117,6 +119,12 @@ jobs:
               nvm install 18
               nvm use 18
             fi
+
+            # Display files for debugging
+            echo "Current directory contents:"
+            ls -la
+            echo "Current directory path:"
+            pwd
 
             # Install dependencies
             npm install
