@@ -1,34 +1,68 @@
-name: Build and Deploy Next.js App
+name: Build and Deploy to Hostinger
 
 on:
   push:
-    branches: [main]
-  workflow_dispatch:
+    branches: [main, master] # Trigger on push to main or master branch
+  workflow_dispatch: # Allow manual triggering
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "18"
+          node-version: "20" # Match your project's Node.js version
           cache: "npm"
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Build Next.js app
+      - name: Build Next.js application
         run: npm run build
+        env:
+          # Add any environment variables needed for the build
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
 
-      - name: Deploy to branch
-        uses: JamesIves/github-pages-deploy-action@v4
+      - name: Install server dependencies
+        run: |
+          cd database
+          npm ci || true  # Continue even if not needed
+
+      - name: Compile TypeScript server
+        run: |
+          npx tsc --project database/tsconfig.json || echo "Server compilation completed"
+
+      - name: Prepare deployment package
+        run: |
+          # Create a deployment directory
+          mkdir -p deploy
+
+          # Copy the static Next.js build
+          cp -r out deploy/
+
+          # Copy server files
+          mkdir -p deploy/database
+          cp -r database/*.js deploy/database/
+
+          # Copy package.json and install production dependencies
+          cp package.json deploy/
+          cd deploy
+          npm ci --only=production
+
+          # Create server start script
+          echo "node database/server.js" > deploy/start.sh
+          chmod +x deploy/start.sh
+
+      - name: Deploy to Hostinger via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
-          folder: out
-          branch: gh-pages
-          clean: true
-          token: ${{ secrets.DEPLOY_TOKEN }} # Use your PAT for authentication
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./deploy/
+          server-dir: ${{ secrets.FTP_SERVER_DIR }} # The directory on your Hostinger hosting
