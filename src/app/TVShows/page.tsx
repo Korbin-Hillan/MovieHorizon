@@ -15,7 +15,7 @@ interface TVShow {
 
 export default function MoviesPage() {
   const [isCollapsed, setIsCollapsed] = useState(false); // NavBar is Expanded by default -> useState(true) if collapse by default
-  const [Shows, setMovies] = useState<TVShow[]>([]);
+  const [movies, setMovies] = useState<TVShow[]>([]); // Fixed: Added 'movies' state variable
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
 
 
@@ -28,6 +28,7 @@ export default function MoviesPage() {
       })
       .catch((error) => console.error("Error fetching movies:", error));
   }, [API_URL]);
+  
   return (
     <div className="flex min-h-screen bg-custom-bg transition-all">
       {/* Sidebar */}

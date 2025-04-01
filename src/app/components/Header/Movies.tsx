@@ -37,25 +37,13 @@ const Movies = () => {
       .catch((error) => console.error("Error fetching popular TV shows:", error));
   }, [API_URL]);
 
-  const scrollLeft = (ref: React.RefObject<HTMLDivElement | null>) => {
-    if (ref.current) {
-      ref.current.scrollBy({ left: -1340, behavior: "smooth" });
-    }
-  };
-  
-  const scrollRight = (ref: React.RefObject<HTMLDivElement | null>) => {
-    if (ref.current) {
-      ref.current.scrollBy({ left: 1340, behavior: "smooth" });
-    }
-  };
-
   const scrollContinuously = (
     ref: React.RefObject<HTMLDivElement | null>,
     direction: "left" | "right"
   ) => {
     if (!ref.current) return;
   
-    let scrollAmount = direction === "right" ? 5 : -5;
+    const scrollAmount = direction === "right" ? 5 : -5;
     let intervalId: NodeJS.Timeout | null = null;
     let delayTimeout: NodeJS.Timeout | null = null;
     let isHeld = false;
