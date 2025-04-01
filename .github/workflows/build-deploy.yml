@@ -40,7 +40,7 @@ jobs:
           strip_components: 1
           debug: true
 
-      - name: Start Express server
+      - name: Setup server environment and start
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOSTINGER_HOST }}
@@ -48,6 +48,35 @@ jobs:
           password: ${{ secrets.HOSTINGER_PASSWORD }}
           port: 65002
           script: |
+            # Check if directory exists, if not create it
+            mkdir -p /home/u451682670/moviehorizon.fun/server
+
+            # Deploy server files (assuming they're in a 'server' directory in your repo)
+            # If your server files are elsewhere, adjust this part
+
+            # Navigate to server directory
             cd /home/u451682670/moviehorizon.fun/server
+
+            # Check if Node.js is installed, if not use NVM to install
+            if ! command -v node &> /dev/null; then
+              echo "Node.js not found, installing via NVM..."
+              # Install NVM
+              curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+              export NVM_DIR="$HOME/.nvm"
+              [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+              # Install Node.js
+              nvm install 18
+              nvm use 18
+            fi
+
+            # Install dependencies
             npm install
+
+            # Install PM2 globally if not installed
+            if ! command -v pm2 &> /dev/null; then
+              echo "PM2 not found, installing..."
+              npm install -g pm2
+            fi
+
+            # Start or restart the server
             pm2 restart server.js || pm2 start server.js --name "movie-api"
