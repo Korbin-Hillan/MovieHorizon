@@ -45,6 +45,7 @@ jobs:
           host: ${{ secrets.HOSTINGER_HOST }}
           username: ${{ secrets.HOSTINGER_USERNAME }}
           password: ${{ secrets.HOSTINGER_PASSWORD }}
+          port: 65002
           script: |
             cd /home/u451682670/moviehorizon.fun/server
             npm install
